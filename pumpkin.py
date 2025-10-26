@@ -28,7 +28,7 @@ pins = [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10]
 lows = [low0, low1, low2, low3, low4, low5, low6, low7, low8, low9, low10]
 while True:
     for i in range (0,11):
-        if (pins[i].read() > (lows[i]):
+        if (pins[i].read()) > (lows[i]):
             print(i, " pressed")
         print(i, ": ", (pins[i]).read())
     time.sleep(1)
