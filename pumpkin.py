@@ -35,12 +35,12 @@ for i in range(0,len(NOTES)):
     
 NOTES = NOTES[0:22]
 
-RANGE = "HIGH" #LOW or HIGH depending on computer
+RANGE = "LOW" #LOW for one ESP32, HIGH for the other
+
 if RANGE == "LOW":
     NOTES = NOTES[0:11]
 else:
     NOTES = NOTES[11:22]
-print(NOTES)
 
 while True:
     for i in range (0, NUM_TOUCH_PINS):
