@@ -1,5 +1,16 @@
 from machine import TouchPad, Pin
 import time
+from machine import Pin, I2S
+import math
+import struct
+from time import sleep
+
+SAMPLE_RATE = 8000
+BYTES_PER_SAMPLE = 2
+
+sck_pin = Pin(14) # Serial clock (BCLK on breakout)
+ws_pin = Pin(13) # Word select (LRCLK on breakout)
+sd_pin = Pin(12) # Serial data (DIN on breakout)
 
 t0 = TouchPad(Pin(11))
 t1 = TouchPad(Pin(12))
@@ -42,9 +53,32 @@ else:
     NOTES = NOTES[11:22]
 print(NOTES)
 
+audio = I2S(0, # This must be either 0 or 1 for ESP32
+            sck=sck_pin, ws=ws_pin, sd=sd_pin,
+            mode=I2S.TX,
+            bits=8*BYTES_PER_SAMPLE,
+            format=I2S.MONO,
+            rate=8000,
+            ibuf=10000)
+
+TONE_FREQ = 400
+AMPLITUDE = 3000
+
+n_samples = SAMPLE_RATE // TONE_FREQ
+buffer_size = n_samples * BYTES_PER_SAMPLE
+
+buf = bytearray(buffer_size)
+
+for i in range(n_samples):
+    sample = int(AMPLITUDE * math.sin(2 * math.pi * i / n_samples))
+    print(sample)
+    struct.pack_into("<h", buf, i*BYTES_PER_SAMPLE, sample)
+
 while True:
+    audio.write(buf)
     for i in range (0, NUM_TOUCH_PINS):
         if (pins[i].read()) > (lows[i]):
             print(i, " pressed")
         print(i, ": ", (pins[i]).read())
     time.sleep(0.1)
+audio.deinit()
