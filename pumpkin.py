@@ -26,9 +26,25 @@ low10 = t10.read() + 500
 
 pins = [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10]
 lows = [low0, low1, low2, low3, low4, low5, low6, low7, low8, low9, low10]
+
+NUM_TOUCH_PINS = 11
+
+NOTES = [261.63,277.18,293.66,311.13,329.63,349.23,369.99,392.0,415.3,440.0,446.16,493.88]
+for i in range(0,len(NOTES)):
+    NOTES.append(NOTES[i] * 2)
+    
+NOTES = NOTES[0:22]
+
+RANGE = "HIGH" #LOW or HIGH depending on computer
+if RANGE == "LOW":
+    NOTES = NOTES[0:11]
+else:
+    NOTES = NOTES[11:22]
+print(NOTES)
+
 while True:
-    for i in range (0,11):
+    for i in range (0, NUM_TOUCH_PINS):
         if (pins[i].read()) > (lows[i]):
             print(i, " pressed")
         print(i, ": ", (pins[i]).read())
-    time.sleep(1)
+    time.sleep(0.1)
