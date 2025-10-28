@@ -48,12 +48,14 @@ for i in range(0,len(NOTES)):
     
 NOTES = NOTES[0:22]
 
-RANGE = "LOW" #LOW for one ESP32, HIGH for the other
+RANGE = "HIGH" #LOW for one ESP32, HIGH for the other
 
 if RANGE == "LOW":
     NOTES = NOTES[0:11]
 else:
     NOTES = NOTES[11:22]
+
+print(NOTES)
 
 audio = I2S(0, # This must be either 0 or 1 for ESP32
             sck=sck_pin, ws=ws_pin, sd=sd_pin,
