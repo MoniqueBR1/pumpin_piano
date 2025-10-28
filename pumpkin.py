@@ -5,7 +5,7 @@ import math
 import struct
 from time import sleep
 
-SAMPLE_RATE = 8000
+SAMPLE_RATE = 12000 #8000
 BYTES_PER_SAMPLE = 2
 
 sck_pin = Pin(15) # Serial clock (BCLK on breakout)
