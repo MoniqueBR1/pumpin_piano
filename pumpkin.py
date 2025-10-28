@@ -42,13 +42,13 @@ lows = [low0, low1, low2, low3, low4, low5, low6, low7, low8, low9, low10]
 
 NUM_TOUCH_PINS = 11
 
-NOTES = [262,277,294,311,330,349,370,392,415,440,446,494]
+NOTES = [262,277,294,311,330,349,370,392,415,440,466,493]
 for i in range(0,len(NOTES)):
     NOTES.append(NOTES[i] * 2)
     
 NOTES = NOTES[0:22]
 
-RANGE = "HIGH" #LOW for one ESP32, HIGH for the other
+RANGE = "LOW" #LOW for one ESP32, HIGH for the other
 
 if RANGE == "LOW":
     NOTES = NOTES[0:11]
