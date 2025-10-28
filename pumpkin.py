@@ -55,8 +55,6 @@ if RANGE == "LOW":
 else:
     NOTES = NOTES[11:22]
 
-print(NOTES)
-
 audio = I2S(0, # This must be either 0 or 1 for ESP32
             sck=sck_pin, ws=ws_pin, sd=sd_pin,
             mode=I2S.TX,
