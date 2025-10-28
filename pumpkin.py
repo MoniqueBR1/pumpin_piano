@@ -12,17 +12,17 @@ sck_pin = Pin(15) # Serial clock (BCLK on breakout)
 ws_pin = Pin(16) # Word select (LRCLK on breakout)
 sd_pin = Pin(17) # Serial data (DIN on breakout)
 
-t0 = TouchPad(Pin(11))
-t1 = TouchPad(Pin(12))
-t2 = TouchPad(Pin(13))
-t3 = TouchPad(Pin(14))
-t4 = TouchPad(Pin(1))
-t5 = TouchPad(Pin(2))
-t6 = TouchPad(Pin(3))
-t7 = TouchPad(Pin(4))
-t8 = TouchPad(Pin(5))
-t9 = TouchPad(Pin(6))
-t10 = TouchPad(Pin(7))
+t0 = TouchPad(Pin(1))
+t1 = TouchPad(Pin(2))
+t2 = TouchPad(Pin(3))
+t3 = TouchPad(Pin(4))
+t4 = TouchPad(Pin(5))
+t5 = TouchPad(Pin(6))
+t6 = TouchPad(Pin(7))
+t7 = TouchPad(Pin(11))
+t8 = TouchPad(Pin(12))
+t9 = TouchPad(Pin(13))
+t10 = TouchPad(Pin(14))
 
 add_to_low = 5000
 low0 = t0.read() + add_to_low
@@ -42,7 +42,7 @@ lows = [low0, low1, low2, low3, low4, low5, low6, low7, low8, low9, low10]
 
 NUM_TOUCH_PINS = 11
 
-NOTES = [262,277,294,311,330,349,370,392,415,440,446,494]
+NOTES = [262,277,294,311,330,349,370,392,415,440,466,494]
 for i in range(0,len(NOTES)):
     NOTES.append(NOTES[i] * 2)
     
