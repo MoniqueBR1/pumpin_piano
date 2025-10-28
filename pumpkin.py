@@ -42,13 +42,13 @@ lows = [low0, low1, low2, low3, low4, low5, low6, low7, low8, low9, low10]
 
 NUM_TOUCH_PINS = 11
 
-NOTES = [262,277,294,311,330,349,370,392,415,440,466,493]
+NOTES = [262,277,294,311,330,349,370,392,415,440,466,494]
 for i in range(0,len(NOTES)):
     NOTES.append(NOTES[i] * 2)
     
 NOTES = NOTES[0:22]
 
-RANGE = "LOW" #LOW for one ESP32, HIGH for the other
+RANGE = "HIGH" #LOW for one ESP32, HIGH for the other
 
 if RANGE == "LOW":
     NOTES = NOTES[0:11]
@@ -76,42 +76,17 @@ tone_feq9 = NOTES[9]
 tone_feq10 = NOTES[10]
 AMPLITUDE = 3000
 
-n_samples0 = SAMPLE_RATE // tone_feq0
-buffer_size0 = n_samples0 * BYTES_PER_SAMPLE
-n_samples1 = SAMPLE_RATE // tone_feq1
-buffer_size1 = n_samples1 * BYTES_PER_SAMPLE
-n_samples2 = SAMPLE_RATE // tone_feq2
-buffer_size2 = n_samples2 * BYTES_PER_SAMPLE
-n_samples3 = SAMPLE_RATE // tone_feq3
-buffer_size3 = n_samples3 * BYTES_PER_SAMPLE
-n_samples4 = SAMPLE_RATE // tone_feq4
-buffer_size4 = n_samples4 * BYTES_PER_SAMPLE
-n_samples5 = SAMPLE_RATE // tone_feq5
-buffer_size5 = n_samples5 * BYTES_PER_SAMPLE
-n_samples6 = SAMPLE_RATE // tone_feq6
-buffer_size6 = n_samples6 * BYTES_PER_SAMPLE
-n_samples7 = SAMPLE_RATE // tone_feq7
-buffer_size7 = n_samples7 * BYTES_PER_SAMPLE
-n_samples8 = SAMPLE_RATE // tone_feq8
-buffer_size8 = n_samples8 * BYTES_PER_SAMPLE
-n_samples9 = SAMPLE_RATE // tone_feq9
-buffer_size9 = n_samples9 * BYTES_PER_SAMPLE
-n_samples10 = SAMPLE_RATE // tone_feq10
-buffer_size10 = n_samples10 * BYTES_PER_SAMPLE
+n_samples = []
+buffer_sizes = []
+buf = []
 
-buf0 = bytearray(buffer_size0)
-buf1 = bytearray(buffer_size1)
-buf2 = bytearray(buffer_size2)
-buf3 = bytearray(buffer_size3)
-buf4 = bytearray(buffer_size4)
-buf5 = bytearray(buffer_size5)
-buf6 = bytearray(buffer_size6)
-buf7 = bytearray(buffer_size7)
-buf8 = bytearray(buffer_size8)
-buf9 = bytearray(buffer_size9)
-buf10 = bytearray(buffer_size10)
-
-buf = [buf0, buf1, buf2, buf3, buf4, buf5, buf6, buf7, buf8, buf9, buf10]
+for i in range(NUM_TOUCH_PINS):
+    tone_freq = NOTES[i]
+    n = SAMPLE_RATE // tone_freq
+    size = n * BYTES_PER_SAMPLE
+    n_samples.append(n)
+    buffer_sizes.append(size)
+    buf.append(bytearray(size))
 
 for i in range(NUM_TOUCH_PINS):
     n_samples = SAMPLE_RATE // NOTES[i]
