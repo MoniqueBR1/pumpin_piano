@@ -8,9 +8,9 @@ from time import sleep
 SAMPLE_RATE = 8000
 BYTES_PER_SAMPLE = 2
 
-sck_pin = Pin(14) # Serial clock (BCLK on breakout)
-ws_pin = Pin(13) # Word select (LRCLK on breakout)
-sd_pin = Pin(12) # Serial data (DIN on breakout)
+sck_pin = Pin(15) # Serial clock (BCLK on breakout)
+ws_pin = Pin(16) # Word select (LRCLK on breakout)
+sd_pin = Pin(17) # Serial data (DIN on breakout)
 
 t0 = TouchPad(Pin(11))
 t1 = TouchPad(Pin(12))
