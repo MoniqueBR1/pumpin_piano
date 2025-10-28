@@ -78,7 +78,7 @@ AMPLITUDE = 3000
 
 n_samples = []
 buffer_sizes = []
-buf = []
+bufs = []
 
 for i in range(NUM_TOUCH_PINS):
     tone_freq = NOTES[i]
@@ -86,21 +86,29 @@ for i in range(NUM_TOUCH_PINS):
     size = n * BYTES_PER_SAMPLE
     n_samples.append(n)
     buffer_sizes.append(size)
-    buf.append(bytearray(size))
+    bufs.append(bytearray(size))
 
 for i in range(NUM_TOUCH_PINS):
     n_samples = SAMPLE_RATE // NOTES[i]
     buffer_size = n_samples * BYTES_PER_SAMPLE
-    buf[i] = bytearray(buffer_size)
+    bufs[i] = bytearray(buffer_size)
     for j in range(n_samples):
         sample = int(AMPLITUDE * math.sin(2 * math.pi * j / n_samples))
-        struct.pack_into("<h", buf[i], j * BYTES_PER_SAMPLE, sample)
+        struct.pack_into("<h", bufs[i], j * BYTES_PER_SAMPLE, sample)
+
+play = False
+pins_pressed = []
 
 while True:
+    play = False
+    pins_pressed = []
     for i in range (0, NUM_TOUCH_PINS):
         if (pins[i].read()) > (lows[i]):
+            play = True
+            pins_pressed.append(i)
             #tone_feq = NOTES[i]
             print(i, " pressed")
-            audio.write(buf[i])
+    if play:
+        audio.write(bufs[pins_pressed[0]])
         #print(i, ": ", (pins[i]).read())
 audio.deinit()
