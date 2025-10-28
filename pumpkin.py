@@ -42,13 +42,13 @@ lows = [low0, low1, low2, low3, low4, low5, low6, low7, low8, low9, low10]
 
 NUM_TOUCH_PINS = 11
 
-NOTES = [261.63,277.18,293.66,311.13,329.63,349.23,369.99,392.0,415.3,440.0,446.16,493.88]
+NOTES = [261,277,293,311,329,349,369,392,415,440,446,493]
 for i in range(0,len(NOTES)):
     NOTES.append(NOTES[i] * 2)
     
 NOTES = NOTES[0:22]
 
-RANGE = "LOW" #LOW for one ESP32, HIGH for the other
+RANGE = "HIGH" #LOW for one ESP32, HIGH for the other
 
 if RANGE == "LOW":
     NOTES = NOTES[0:11]
@@ -79,8 +79,16 @@ for i in range(n_samples):
 while True:
     for i in range (0, NUM_TOUCH_PINS):
         if (pins[i].read()) > (lows[i]):
-            #tone_feq = NOTES[i]
+            tone_feq = NOTES[i]
+            n_samples = SAMPLE_RATE // tone_feq
+            buffer_size = n_samples * BYTES_PER_SAMPLE
+            buf = bytearray(buffer_size)
+            for j in range(n_samples):
+                sample = int(AMPLITUDE * math.sin(2 * math.pi * j / n_samples))
+                #print(sample)
+                struct.pack_into("<h", buf, j*BYTES_PER_SAMPLE, sample)
             print(i, " pressed")
             audio.write(buf)
+            break
         #print(i, ": ", (pins[i]).read())
 audio.deinit()
