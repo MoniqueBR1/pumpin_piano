@@ -5,7 +5,7 @@ import math
 import struct
 from time import sleep
 
-SAMPLE_RATE = 8000
+SAMPLE_RATE = 16000
 BYTES_PER_SAMPLE = 2
 
 sck_pin = Pin(15) # Serial clock (BCLK on breakout)
@@ -54,8 +54,6 @@ if RANGE == "LOW":
     NOTES = NOTES[0:11]
 else:
     NOTES = NOTES[11:22]
-
-print(NOTES)
 
 audio = I2S(0, # This must be either 0 or 1 for ESP32
             sck=sck_pin, ws=ws_pin, sd=sd_pin,
