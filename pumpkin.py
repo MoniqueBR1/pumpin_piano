@@ -79,6 +79,7 @@ AMPLITUDE = 3000
 n_samples = []
 buffer_sizes = []
 bufs = []
+arrs = []
 
 for i in range(NUM_TOUCH_PINS):
     tone_freq = NOTES[i]
@@ -87,6 +88,8 @@ for i in range(NUM_TOUCH_PINS):
     n_samples.append(n)
     buffer_sizes.append(size)
     bufs.append(bytearray(size))
+    arr = []
+    arrs.append(arr)
 
 for i in range(NUM_TOUCH_PINS):
     n_samples = SAMPLE_RATE // NOTES[i]
@@ -95,20 +98,63 @@ for i in range(NUM_TOUCH_PINS):
     for j in range(n_samples):
         sample = int(AMPLITUDE * math.sin(2 * math.pi * j / n_samples))
         struct.pack_into("<h", bufs[i], j * BYTES_PER_SAMPLE, sample)
+        arrs[i].append(sample)
+
+def make_buf(keys_pressed):
+    indices = [] # the indices of the pressed keys
+    component_arrs = [] # the bufs of the individual notes
+    for i in range(0,len(keys_pressed)):
+        if keys_pressed[i]:
+            indices.append(i) # populates indices
+    for i in indices:
+        component_arrs.append(arrs[i]) # populates component_bufs
+    lens = [] # list of n_samples of each component buf
+    for b in component_arrs:
+        lens.append(len(b))
+    max_len = max(lens)
+    buffer_size = int(max_len * 2 * BYTES_PER_SAMPLE)
+    buf = bytearray(buffer_size)
+    #print(buffer_size, len(component_arrs[0]))
+    print(len(component_arrs))
+    for i in range(0, max_len * 2):
+        sample = 0
+        for j in range(0,len(component_arrs)):
+        #sample = arrs[0][i % len(arrs[0])] + arrs[1][i % len(arrs[1])]
+#             if i >= len(arrs[j]):
+              sample += component_arrs[j][i % len(component_arrs[j])]
+        
+        print(sample, component_arrs[0][i % len(component_arrs[0])], component_arrs[1][i % len(component_arrs[1])])
+        sample = int(sample / len(indices))
+        struct.pack_into("<h", buf, int(i * BYTES_PER_SAMPLE), sample)
+        #for j in range(0, len(component_bufs)):
+    #print(arrs[0])
+    #print(component_bufs[0])
+    #print(buf)
+    return buf
+#     print(component_bufs[0])
+#     for i in range(0,len(component_bufs[0])):
+#         print(component_bufs[0][i])
+    
+
+test_buf = make_buf([1,0,0,0,0,0,0,1])
 
 play = False
-pins_pressed = []
+keys_pressed = []
 
 while True:
     play = False
-    pins_pressed = []
+    keys_pressed = []
     for i in range (0, NUM_TOUCH_PINS):
         if (pins[i].read()) > (lows[i]):
             play = True
-            pins_pressed.append(i)
+            keys_pressed.append(i)
             #tone_feq = NOTES[i]
             print(i, " pressed")
-    if play:
-        audio.write(bufs[pins_pressed[0]])
+    if play and 0 in keys_pressed:
+        audio.write(bufs[0])
         #print(i, ": ", (pins[i]).read())
+    if play and 1 in keys_pressed:
+        audio.write(bufs[7])
+    if play and 2 in keys_pressed:
+        audio.write(test_buf)
 audio.deinit()
