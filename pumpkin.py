@@ -3,7 +3,6 @@ import time
 from machine import Pin, I2S
 import math
 import struct
-from time import sleep
 
 SAMPLE_RATE = 12000 #8000
 BYTES_PER_SAMPLE = 2
@@ -60,20 +59,9 @@ audio = I2S(0, # This must be either 0 or 1 for ESP32
             mode=I2S.TX,
             bits=8*BYTES_PER_SAMPLE,
             format=I2S.MONO,
-            rate=8000,
+            rate=SAMPLE_RATE,#8000,
             ibuf=10000)
 
-tone_feq0 = NOTES[0]
-tone_feq1 = NOTES[1]
-tone_feq2 = NOTES[2]
-tone_feq3 = NOTES[3]
-tone_feq4 = NOTES[4]
-tone_feq5 = NOTES[5]
-tone_feq6 = NOTES[6]
-tone_feq7 = NOTES[7]
-tone_feq8 = NOTES[8]
-tone_feq9 = NOTES[9]
-tone_feq10 = NOTES[10]
 AMPLITUDE = 3000
 
 n_samples = []
@@ -99,47 +87,50 @@ for i in range(NUM_TOUCH_PINS):
         sample = int(AMPLITUDE * math.sin(2 * math.pi * j / n_samples))
         struct.pack_into("<h", bufs[i], j * BYTES_PER_SAMPLE, sample)
         arrs[i].append(sample)
+        
+# returns the least common multiple of a list of integers
+def lcm(nums):
+    if len(nums) == 0:
+        return 0
+    if len(nums) == 1:
+        return nums[0]
+    if len(nums) == 2:
+        a = nums[0]
+        b = nums[1]
+        while b:
+            a, b = b, a % b
+        return abs(nums[0] * nums[1]) // a
+    return lcm([lcm(nums[:len(nums) - 1]), nums[len(nums)-1]])
 
 def make_buf(keys_pressed):
-    indices = [] # the indices of the pressed keys
-    component_arrs = [] # the bufs of the individual notes
-    for i in range(0,len(keys_pressed)):
-        if keys_pressed[i]:
-            indices.append(i) # populates indices
-    for i in indices:
-        component_arrs.append(arrs[i]) # populates component_bufs
-    lens = [] # list of n_samples of each component buf
+    if len(keys_pressed) == 0:
+        buf = bytearray(1 * BYTES_PER_SAMPLE)
+        struct.pack_into("<h", buf, 0, 0)
+        return buf
+    
+    component_arrs = [] # the arrays of the individual notes
+    for i in keys_pressed:
+        component_arrs.append(arrs[i]) # populates component_arrs
+    lens = [] # list of length of each component_arr
     for b in component_arrs:
         lens.append(len(b))
-    max_len = max(lens)
-    buffer_size = int(max_len * 2 * BYTES_PER_SAMPLE)
+    new_len = lcm(lens) #length of array is least common multiple of lengths of component arrays
+    buffer_size = int(new_len * BYTES_PER_SAMPLE)
     buf = bytearray(buffer_size)
-    #print(buffer_size, len(component_arrs[0]))
-    print(len(component_arrs))
-    for i in range(0, max_len * 2):
+    for i in range(0, new_len):
         sample = 0
         for j in range(0,len(component_arrs)):
-        #sample = arrs[0][i % len(arrs[0])] + arrs[1][i % len(arrs[1])]
-#             if i >= len(arrs[j]):
-              sample += component_arrs[j][i % len(component_arrs[j])]
-        
-        print(sample, component_arrs[0][i % len(component_arrs[0])], component_arrs[1][i % len(component_arrs[1])])
-        sample = int(sample / len(indices))
+            sample += component_arrs[j][i % len(component_arrs[j])]
+        sample = int(sample / len(keys_pressed))
         struct.pack_into("<h", buf, int(i * BYTES_PER_SAMPLE), sample)
-        #for j in range(0, len(component_bufs)):
-    #print(arrs[0])
-    #print(component_bufs[0])
-    #print(buf)
     return buf
-#     print(component_bufs[0])
-#     for i in range(0,len(component_bufs[0])):
-#         print(component_bufs[0][i])
     
 
-test_buf = make_buf([1,0,0,0,0,0,0,1])
+buf = make_buf([])
 
 play = False
 keys_pressed = []
+prev_keys_pressed = []
 
 while True:
     play = False
@@ -148,13 +139,9 @@ while True:
         if (pins[i].read()) > (lows[i]):
             play = True
             keys_pressed.append(i)
-            #tone_feq = NOTES[i]
-            print(i, " pressed")
-    if play and 0 in keys_pressed:
-        audio.write(bufs[0])
-        #print(i, ": ", (pins[i]).read())
-    if play and 1 in keys_pressed:
-        audio.write(bufs[7])
-    if play and 2 in keys_pressed:
-        audio.write(test_buf)
+    if keys_pressed != prev_keys_pressed:
+        buf = make_buf(keys_pressed)
+    audio.write(buf)
+    prev_keys_pressed = keys_pressed
+
 audio.deinit()
