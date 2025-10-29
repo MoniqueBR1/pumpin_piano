@@ -81,13 +81,15 @@ def make_buf(keys_pressed):
     component_arrs = [] # the arrays of the individual notes
     for i in keys_pressed:
         component_arrs.append(arrs[i]) # populates component_arrs
+        
     lens = [len(a) for a in component_arrs] # list of length of each component_arr
-    new_len = lcm(lens) # length of resultant array is least common multiple of lengths of component arrays
+    new_len = lcm(lens) # length of resultant array is least common multiple of lengths of component arrays (for smooth sound)
     len_cutoff = 10000 # maximum number of samples (to prevent lag)
     if new_len > len_cutoff:
         new_len = len_cutoff
     buffer_size = int(new_len * BYTES_PER_SAMPLE)
     buf = bytearray(buffer_size)
+
     for i in range(0, new_len):
         sample = 0
         for j in range(0,len(component_arrs)):
@@ -97,14 +99,13 @@ def make_buf(keys_pressed):
     return buf
 
 buf = make_buf([])
-
 keys_pressed = []
 prev_keys_pressed = []
 
 while True:
     keys_pressed = []
     for i in range (0, NUM_TOUCH_PINS):
-        if (pins[i].read()) > (lows[i]):
+        if pins[i].read() > lows[i]:
             keys_pressed.append(i)
     if keys_pressed != prev_keys_pressed:
         buf = make_buf(keys_pressed)
